@@ -2,7 +2,7 @@
 
 this project has two separate programs, crawler and indexer which are connected through rabbitmq.
 
-the crawler program connects to telegram with a bot session generated earlear and listens for new messages. each new message is decrypted to sender name and message text and sent on the rabbitmq channel to be indexed by indexer.
+the crawler program connects to telegram with a bot session generated earlier and listens for new messages. each new message is decrypted to sender name and message text and sent on the rabbitmq channel to be indexed by indexer.
 
 indexer program receives new messages from rabbitmq channel and indexes it on elasticsearch.
 
