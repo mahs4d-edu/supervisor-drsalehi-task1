@@ -18,9 +18,10 @@ class Engine:
         """
         self.rabbitmq_channel.queue_declare(queue='telecrawl_message')
         self.rabbitmq_channel.basic_consume(queue='telecrawl_message',
-                                            auto_ack=True,
                                             on_message_callback=self._on_queue_event)
-        self.rabbitmq_channel.start_consuming()
+
+        for indexer in self.indexers:
+            indexer.setup()
 
     def _on_queue_event(self, ch, method, properties, body):
         """
@@ -29,3 +30,5 @@ class Engine:
         payload = json.loads(body)
         for indexer in self.indexers:
             indexer.on_message(payload['sender'], payload['text'])
+
+        self.rabbitmq_channel.basic_ack(delivery_tag=method.delivery_tag)

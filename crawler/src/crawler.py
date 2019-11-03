@@ -20,7 +20,7 @@ class Crawler:
         finally:
             self.client.disconnect()
 
-    @events.register(events.NewMessage)
+    @events.register(events.NewMessage(incoming=True, outgoing=False))
     async def _on_message(self, event):
         sender = await event.get_sender()
         sender_name = utils.get_display_name(sender)

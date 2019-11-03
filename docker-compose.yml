@@ -6,6 +6,8 @@ services:
     environment:
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: 5672
+      TELECRAWL_APP_ID: 28800
+      TELECRAWL_APP_HASH: "b723b335c560c0897a0bdf4d5d77bba1"
     volumes:
       - type: bind
         source: ./data/sessions
@@ -14,22 +16,25 @@ services:
       - my_network
     depends_on:
       - rabbitmq
-    
+    restart: on-failure
+
   indexer:
     build: ./indexer
     environment:
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: 5672
       ELASTICSEARCH_HOST: "elasticsearch"
-      ELASTICSEARCH_PORT: 9300
+      ELASTICSEARCH_PORT: 9200
     networks:
       - my_network
-    depends_on: 
+    depends_on:
       - rabbitmq
-  
+      - elasticsearch
+    restart: on-failure
+
   rabbitmq:
     image: "rabbitmq:3.8"
-    ports:
+    expose:
       - 5672
     volumes:
       - type: volume
@@ -38,8 +43,33 @@ services:
     networks:
       - my_network
 
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.4.1"
+    expose:
+      - 9300
+    volumes:
+      - type: volume
+        source: elasticsearch_volume
+        target: /usr/share/elasticsearch/data
+    environment:
+      discovery.type: "single-node"
+    networks:
+      - my_network
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:7.4.2"
+    expose:
+      - 5601
+    ports:
+      - "5601:5601"
+    networks:
+      - my_network
+    depends_on:
+      - elasticsearch
+
 volumes:
   rabbitmq_volume:
+  elasticsearch_volume:
 
 networks:
   my_network:
