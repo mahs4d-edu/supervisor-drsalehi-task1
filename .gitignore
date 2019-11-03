@@ -1,0 +1,12 @@
+# ide
+.vscode
+
+# data
+data/sessions/*
+
+# compiled python files
+__pycache__
+*.pyc
+
+# keep .gitkeep
+!.gitkeep

@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  crawler:
+    build: ./crawler
+    environment:
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: 5672
+    volumes:
+      - type: bind
+        source: ./data/sessions
+        target: /data/telecrawl/sessions
+    networks:
+      - my_network
+    depends_on:
+      - rabbitmq
+    
+  indexer:
+    build: ./indexer
+    environment:
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: 5672
+      ELASTICSEARCH_HOST: "elasticsearch"
+      ELASTICSEARCH_PORT: 9300
+    networks:
+      - my_network
+    depends_on: 
+      - rabbitmq
+  
+  rabbitmq:
+    image: "rabbitmq:3.8"
+    ports:
+      - 5672
+    volumes:
+      - type: volume
+        source: rabbitmq_volume
+        target: /var/lib/rabbitmq
+    networks:
+      - my_network
+
+volumes:
+  rabbitmq_volume:
+
+networks:
+  my_network:
